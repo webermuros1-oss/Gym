@@ -116,4 +116,12 @@ public class ActivityService {
                 .map(ActivityMapper::toDTO)
                 .toList();
     }
+
+    public List<ActivityDTO> getActivitiesByTeacher(Long teacherId) {
+        return activityRepository.findAll().stream()
+                .filter(activity -> activity.getTeacher() != null)
+                .filter(activity -> activity.getTeacher().getId().equals(teacherId))
+                .map(ActivityMapper::toDTO)
+                .toList();
+    }
 }
