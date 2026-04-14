@@ -107,4 +107,13 @@ public class ActivityService {
                 .map(ActivityMapper::toDTO)
                 .toList();
     }
+
+    public List<ActivityDTO> getActivitiesByUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return user.getActivities().stream()
+                .map(ActivityMapper::toDTO)
+                .toList();
+    }
 }
