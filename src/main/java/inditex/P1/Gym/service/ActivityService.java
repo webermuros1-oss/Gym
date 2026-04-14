@@ -1,6 +1,7 @@
 package inditex.P1.Gym.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -97,5 +98,13 @@ public class ActivityService {
 
         Activity savedActivity = activityRepository.save(activity);
         return ActivityMapper.toDTO(savedActivity);
+    }
+
+    public List<ActivityDTO> getFutureActivities() {
+        return activityRepository.findAll().stream()
+                .filter(activity -> activity.getDate() != null)
+                .filter(activity -> activity.getDate().isAfter(LocalDateTime.now()))
+                .map(ActivityMapper::toDTO)
+                .toList();
     }
 }
