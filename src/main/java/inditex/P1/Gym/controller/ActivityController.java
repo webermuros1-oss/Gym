@@ -1,9 +1,12 @@
 package inditex.P1.Gym.controller;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import inditex.P1.Gym.dto.ActivityDTO;
 import inditex.P1.Gym.service.ActivityService;
@@ -21,5 +24,20 @@ public class ActivityController {
     @PostMapping
     public ActivityDTO create(@RequestBody ActivityDTO dto) {
         return activityService.create(dto);
+    }
+
+    @PostMapping("/{activityId}/users/{userId}")
+    public ActivityDTO registerUser(@PathVariable Long activityId, @PathVariable Long userId) {
+        return activityService.registerUser(activityId, userId);
+    }
+
+    @PutMapping("/{id}")
+    public ActivityDTO update(@PathVariable Long id, @RequestBody ActivityDTO dto) {
+        return activityService.update(id, dto);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        activityService.delete(id);
     }
 }
