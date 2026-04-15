@@ -26,7 +26,7 @@ public class UserRequestDTO {
     private String dni;
 
     @NotNull(message = "El año de alta no puede ser nulo")
-    @Min(value = 2000, message = "El año de alat no es válido")
+    @Min(value = 2000, message = "El año de alta no es válido")
     private Integer registrationYear;
 
     private boolean active;

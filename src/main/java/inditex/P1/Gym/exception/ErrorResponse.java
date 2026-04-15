@@ -3,8 +3,8 @@ package inditex.P1.Gym.exception;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-import lombok.Builder;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,7 +16,8 @@ import lombok.Setter;
 @Builder
 public class ErrorResponse {
 
-    private LocalDateTime timestamp;
+    @Builder.Default
+    private LocalDateTime timestamp = LocalDateTime.now();
     private int status;
     private String error;
     private String message;

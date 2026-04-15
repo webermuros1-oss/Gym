@@ -2,9 +2,9 @@ package inditex.P1.Gym.service;
 
 import inditex.P1.Gym.DTO.UserRequestDTO;
 import inditex.P1.Gym.DTO.UserResponseDTO;
+import inditex.P1.Gym.exception.ObjectNotFoundException;
 import inditex.P1.Gym.model.User;
 import inditex.P1.Gym.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +25,7 @@ public class UserService {
 
     public UserResponseDTO getUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con id: " + id));
+                .orElseThrow(() -> new ObjectNotFoundException("User", id));
         return toResponseDTO(user);
     }
 
@@ -38,16 +38,15 @@ public class UserService {
 
     public UserResponseDTO createUser(UserRequestDTO dto) {
         if (userRepository.findByDni(dto.getDni()).isPresent()) {
-            throw new IllegalArgumentException("Ya existe un usuario con el DNI: " + dto.getDni());
+            throw new ObjectNotFoundException("User", dto.getDni());
         }
-
         User user = toEntity(dto);
         return toResponseDTO(userRepository.save(user));
     }
 
     public UserResponseDTO updateUser(Long id, UserRequestDTO dto) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con id: " + id));
+                .orElseThrow(() -> new ObjectNotFoundException("User", id));
 
         user.setFirstName(dto.getFirstName());
         user.setLastName(dto.getLastName());
@@ -61,7 +60,7 @@ public class UserService {
 
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new EntityNotFoundException("Usuario no encontrado con id: " + id);
+            throw new ObjectNotFoundException("User", id);
         }
         userRepository.deleteById(id);
     }
@@ -79,13 +78,14 @@ public class UserService {
     }
 
     private User toEntity(UserRequestDTO dto) {
-        User user = new User();
-        user.setFirstName(dto.getFirstName());
-        user.setLastName(dto.getLastName());
-        user.setDni(dto.getDni());
-        user.setRegistrationYear(dto.getRegistrationYear());
-        user.setActive(dto.isActive());
-        user.setImageUrl(dto.getImageUrl());
-        return user;
+        return new User(
+                null,
+                dto.getFirstName(),
+                dto.getLastName(),
+                dto.getDni(),
+                dto.getRegistrationYear(),
+                dto.isActive(),
+                dto.getImageUrl()
+        );
     }
 }
