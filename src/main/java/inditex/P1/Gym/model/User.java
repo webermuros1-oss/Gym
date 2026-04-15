@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "users")
 @Getter
@@ -37,4 +40,7 @@ public class User {
 
     @Column(name = "imageUrl", length = 255)
     private String imageUrl;
+
+    @ManyToMany(mappedBy = "users")
+    private Set<Activity> activities = new HashSet<>();
 }

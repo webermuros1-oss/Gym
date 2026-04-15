@@ -65,7 +65,7 @@ public class UserService {
 
     // ---Mapeos ----
 
-    private UserResponseDTO toResponseDTO(User user) {
+    public UserResponseDTO toResponseDTO(User user) {
         return new UserResponseDTO(
                 user.getId(),
                 user.getFirstName(),

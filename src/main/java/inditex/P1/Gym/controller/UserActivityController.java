@@ -2,16 +2,18 @@ package inditex.P1.Gym.controller;
 
 import java.util.List;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import inditex.P1.Gym.DTO.ActivityResponseDTO;
 import inditex.P1.Gym.service.ActivityService;
 
+
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
+@CrossOrigin(origins = "*")
 public class UserActivityController {
 
     private final ActivityService activityService;
@@ -21,7 +23,7 @@ public class UserActivityController {
     }
 
     @GetMapping("/{userId}/activities")
-    public List<ActivityResponseDTO> getActivitiesByUser(@PathVariable Long userId) {
-        return activityService.getActivitiesByUser(userId);
+    public ResponseEntity<List<ActivityResponseDTO>> getActivitiesByUser(@PathVariable Long userId) {
+        return ResponseEntity.ok(activityService.getActivitiesByUser(userId));
     }
 }

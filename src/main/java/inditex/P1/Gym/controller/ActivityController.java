@@ -3,51 +3,59 @@ package inditex.P1.Gym.controller;
 import java.util.List;
 
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PathVariable;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import inditex.P1.Gym.DTO.ActivityDetailResponseDTO;
 import inditex.P1.Gym.DTO.ActivityRequestDTO;
 import inditex.P1.Gym.DTO.ActivityResponseDTO;
 import inditex.P1.Gym.service.ActivityService;
 
 @RestController
-@RequestMapping("/activities")
+@RequestMapping("/api/activities")
+@RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class ActivityController {
 
     private final ActivityService activityService;
 
-    public ActivityController(ActivityService activityService) {
-        this.activityService = activityService;
+    @GetMapping("/future")
+    public ResponseEntity<List<ActivityResponseDTO>> getFutureActivities() {
+        return ResponseEntity.ok(activityService.getFutureActivities());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ActivityDetailResponseDTO> getActivityDetail(@PathVariable Long id) {
+        return ResponseEntity.ok(activityService.getActivityDetail(id));
+    }
+
+    @GetMapping("/teacher/{teacherId}")
+    public ResponseEntity<List<ActivityResponseDTO>> getActivitiesByTeacher(@PathVariable Long teacherId) {
+        return ResponseEntity.ok(activityService.getActivitiesByTeacher(teacherId));
     }
 
     @PostMapping
-    public ActivityResponseDTO create(@Valid @RequestBody ActivityRequestDTO dto) {
-        return activityService.create(dto);
-    }
-
-    @PostMapping("/{activityId}/users/{userId}")
-    public ActivityResponseDTO registerUser(@PathVariable Long activityId, @PathVariable Long userId) {
-        return activityService.registerUser(activityId, userId);
-    }
-
-    @GetMapping("/future")
-    public List<ActivityResponseDTO> getFutureActivities() {
-        return activityService.getFutureActivities();
+    public ResponseEntity<ActivityResponseDTO> create(@Valid @RequestBody ActivityRequestDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(activityService.create(dto));
     }
 
     @PutMapping("/{id}")
-    public ActivityResponseDTO update(@PathVariable Long id, @Valid @RequestBody ActivityRequestDTO dto) {
-        return activityService.update(id, dto);
+    public ResponseEntity<ActivityResponseDTO> update(@PathVariable Long id,
+                                                      @Valid @RequestBody ActivityRequestDTO dto) {
+        return ResponseEntity.ok(activityService.update(id, dto));
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         activityService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{activityId}/users/{userId}")
+    public ResponseEntity<ActivityResponseDTO> registerUser(@PathVariable Long activityId,
+                                                            @PathVariable Long userId) {
+        return ResponseEntity.ok(activityService.registerUser(activityId, userId));
     }
 }
