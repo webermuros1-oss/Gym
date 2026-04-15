@@ -85,7 +85,8 @@ public class UserService {
                 dto.getDni(),
                 dto.getRegistrationYear(),
                 dto.isActive(),
-                dto.getImageUrl()
+                dto.getImageUrl(),
+                new java.util.HashSet<>()
         );
     }
 }

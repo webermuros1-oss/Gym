@@ -1,5 +1,7 @@
 package inditex.P1.Gym.exception;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -13,6 +15,8 @@ import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     // 404 / 409 - Objeto no encontrado o conflicto de datos
     @ExceptionHandler(ObjectNotFoundException.class)
@@ -45,6 +49,7 @@ public class GlobalExceptionHandler {
     // 500 - Cualquier error inesperado
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneric(Exception exception) {
+        log.error("Error inesperado: {}", exception.getMessage(), exception);
         return new ResponseEntity<>(new ErrorResponse("Error interno del servidor"), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

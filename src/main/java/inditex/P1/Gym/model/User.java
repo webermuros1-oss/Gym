@@ -20,11 +20,11 @@ public class User {
     private Long id;
 
     @NotBlank(message = "El nombre no puede estar vacío")
-    @Column(name = "firstName", length = 100)
+    @Column(name = "first_name", length = 100)
     private String firstName;
 
     @NotBlank(message = "Los apellidos no pueden estar vacíos")
-    @Column(name = "lastName", length = 100)
+    @Column(name = "last_name", length = 100)
     private String lastName;
 
     @NotBlank(message = "El DNI no puede estar vacío")
@@ -33,12 +33,12 @@ public class User {
 
     @NotNull(message = "El año de alta no puede ser nulo")
     @Min(value = 2000, message = "El año de alta no es válido")
-    @Column(name = "registrationYear")
+    @Column(name = "registration_year")
     private Integer registrationYear;
 
     private boolean active;
 
-    @Column(name = "imageUrl", length = 255)
+    @Column(name = "image_url", length = 255)
     private String imageUrl;
 
     @ManyToMany(mappedBy = "users")
