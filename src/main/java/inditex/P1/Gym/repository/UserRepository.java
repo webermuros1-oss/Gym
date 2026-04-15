@@ -1,8 +1,15 @@
 package inditex.P1.Gym.repository;
 
+import inditex.P1.Gym.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import inditex.P1.Gym.entity.User;
+import java.util.List;
+import java.util.Optional;
 
+@Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+
+    Optional<User> findByDni(String dni);
+    List<User> findByActiveTrue();
 }

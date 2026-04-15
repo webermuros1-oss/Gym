@@ -5,11 +5,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import inditex.P1.Gym.dto.ActivityDTO;
-import inditex.P1.Gym.entity.Activity;
-import inditex.P1.Gym.entity.Teacher;
-import inditex.P1.Gym.entity.User;
-import inditex.P1.Gym.mapper.ActivityMapper;
+import inditex.P1.Gym.DTO.ActivityDTO;
+import inditex.P1.Gym.model.Activity;
+import inditex.P1.Gym.model.Teacher;
+import inditex.P1.Gym.model.User;
 import inditex.P1.Gym.repository.ActivityRepository;
 import inditex.P1.Gym.repository.TeacherRepository;
 import inditex.P1.Gym.repository.UserRepository;
@@ -21,8 +20,11 @@ public class ActivityService {
     private final TeacherRepository teacherRepository;
     private final UserRepository userRepository;
 
-    public ActivityService(ActivityRepository activityRepository, TeacherRepository teacherRepository,
-            UserRepository userRepository) {
+    public ActivityService(
+            ActivityRepository activityRepository,
+            TeacherRepository teacherRepository,
+            UserRepository userRepository
+    ) {
         this.activityRepository = activityRepository;
         this.teacherRepository = teacherRepository;
         this.userRepository = userRepository;
@@ -41,7 +43,7 @@ public class ActivityService {
         activity.setTeacher(teacher);
 
         Activity savedActivity = activityRepository.save(activity);
-        return ActivityMapper.toDTO(savedActivity);
+        return toDTO(savedActivity);
     }
 
     public ActivityDTO update(Long id, ActivityDTO dto) {
@@ -59,14 +61,13 @@ public class ActivityService {
         activity.setTeacher(teacher);
 
         Activity updatedActivity = activityRepository.save(activity);
-        return ActivityMapper.toDTO(updatedActivity);
+        return toDTO(updatedActivity);
     }
 
     public void delete(Long id) {
         if (!activityRepository.existsById(id)) {
             throw new RuntimeException("Activity not found");
         }
-
         activityRepository.deleteById(id);
     }
 
@@ -85,9 +86,10 @@ public class ActivityService {
             throw new RuntimeException("User already registered");
         }
 
-        long futureActivitiesCount = user.getActivities().stream()
-                .filter(userActivity -> userActivity.getDate() != null)
-                .filter(userActivity -> userActivity.getDate().isAfter(LocalDateTime.now()))
+        long futureActivitiesCount = activityRepository.findAll().stream()
+                .filter(savedActivity -> savedActivity.getDate() != null)
+                .filter(savedActivity -> savedActivity.getDate().isAfter(LocalDateTime.now()))
+                .filter(savedActivity -> savedActivity.getUsers().contains(user))
                 .count();
 
         if (futureActivitiesCount >= 3) {
@@ -95,16 +97,15 @@ public class ActivityService {
         }
 
         activity.getUsers().add(user);
-
         Activity savedActivity = activityRepository.save(activity);
-        return ActivityMapper.toDTO(savedActivity);
+        return toDTO(savedActivity);
     }
 
     public List<ActivityDTO> getFutureActivities() {
         return activityRepository.findAll().stream()
                 .filter(activity -> activity.getDate() != null)
                 .filter(activity -> activity.getDate().isAfter(LocalDateTime.now()))
-                .map(ActivityMapper::toDTO)
+                .map(this::toDTO)
                 .toList();
     }
 
@@ -112,8 +113,9 @@ public class ActivityService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return user.getActivities().stream()
-                .map(ActivityMapper::toDTO)
+        return activityRepository.findAll().stream()
+                .filter(activity -> activity.getUsers().contains(user))
+                .map(this::toDTO)
                 .toList();
     }
 
@@ -121,7 +123,19 @@ public class ActivityService {
         return activityRepository.findAll().stream()
                 .filter(activity -> activity.getTeacher() != null)
                 .filter(activity -> activity.getTeacher().getId().equals(teacherId))
-                .map(ActivityMapper::toDTO)
+                .map(this::toDTO)
                 .toList();
+    }
+
+    private ActivityDTO toDTO(Activity activity) {
+        ActivityDTO activityDTO = new ActivityDTO();
+        activityDTO.setId(activity.getId());
+        activityDTO.setTitle(activity.getTitle());
+        activityDTO.setDescription(activity.getDescription());
+        activityDTO.setPrice(activity.getPrice());
+        activityDTO.setDate(activity.getDate());
+        activityDTO.setImageUrl(activity.getImageUrl());
+        activityDTO.setTeacherId(activity.getTeacher() != null ? activity.getTeacher().getId() : null);
+        return activityDTO;
     }
 }

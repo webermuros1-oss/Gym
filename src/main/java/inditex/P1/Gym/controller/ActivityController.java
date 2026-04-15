@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import inditex.P1.Gym.dto.ActivityDTO;
+import inditex.P1.Gym.DTO.ActivityDTO;
 import inditex.P1.Gym.service.ActivityService;
 
 @RestController
