@@ -1,16 +1,14 @@
 package inditex.P1.Gym.service;
 
-
 import inditex.P1.Gym.DTO.UserRequestDTO;
 import inditex.P1.Gym.DTO.UserResponseDTO;
+import inditex.P1.Gym.exception.ObjectNotFoundException;
 import inditex.P1.Gym.model.User;
 import inditex.P1.Gym.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
-
 
 @Service
 @RequiredArgsConstructor
@@ -23,13 +21,12 @@ public class UserService {
                 .stream()
                 .map(this::toResponseDTO)
                 .collect(Collectors.toList());
-
     }
 
     public UserResponseDTO getUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con id: " + id));
-return toResponseDTO(user);
+                .orElseThrow(() -> new ObjectNotFoundException("User", id));
+        return toResponseDTO(user);
     }
 
     public List<UserResponseDTO> getActiveUsers() {
@@ -41,15 +38,15 @@ return toResponseDTO(user);
 
     public UserResponseDTO createUser(UserRequestDTO dto) {
         if (userRepository.findByDni(dto.getDni()).isPresent()) {
-            throw new IllegalArgumentException("Ya existe un usuario con del DNI: " + dto.getDni());
+            throw new IllegalArgumentException("Ya existe un usuario con el DNI: " + dto.getDni());
         }
-User user = toEntity(dto);
+        User user = toEntity(dto);
         return toResponseDTO(userRepository.save(user));
     }
 
     public UserResponseDTO updateUser(Long id, UserRequestDTO dto) {
-       User user = userRepository.findById(id)
-               .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con id:" + id));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("User", id));
         user.setFirstName(dto.getFirstName());
         user.setLastName(dto.getLastName());
         user.setDni(dto.getDni());
@@ -58,14 +55,15 @@ User user = toEntity(dto);
         user.setImageUrl(dto.getImageUrl());
         return toResponseDTO(userRepository.save(user));
     }
-      public void deleteUser (Long id) {
+
+    public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new EntityNotFoundException("Usuario no encontro con id: " + id);
+            throw new ObjectNotFoundException("User", id);
         }
         userRepository.deleteById(id);
-      }
+    }
 
-      // ---Mapeos ----
+    // ---Mapeos ----
 
     private UserResponseDTO toResponseDTO(User user) {
         return new UserResponseDTO(
@@ -78,15 +76,16 @@ User user = toEntity(dto);
                 user.getImageUrl()
         );
     }
-private User toEntity(UserRequestDTO dto) {
-         return new User(
-                 null,
-                 dto.getFirstName(),
-                 dto.getLastName(),
-                 dto.getDni(),
-                 dto.getRegistrationYear(),
-                 dto.isActive(),
-                 dto.getImageUrl()
-         );
- }
+
+    private User toEntity(UserRequestDTO dto) {
+        return new User(
+                null,
+                dto.getFirstName(),
+                dto.getLastName(),
+                dto.getDni(),
+                dto.getRegistrationYear(),
+                dto.isActive(),
+                dto.getImageUrl()
+        );
+    }
 }
