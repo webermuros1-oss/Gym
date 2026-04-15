@@ -2,7 +2,6 @@ package inditex.P1.Gym.service;
 
 import inditex.P1.Gym.DTO.UserRequestDTO;
 import inditex.P1.Gym.DTO.UserResponseDTO;
-import inditex.P1.Gym.exception.DuplicateDniException;
 import inditex.P1.Gym.exception.ObjectNotFoundException;
 import inditex.P1.Gym.model.User;
 import inditex.P1.Gym.repository.UserRepository;
@@ -39,7 +38,7 @@ public class UserService {
 
     public UserResponseDTO createUser(UserRequestDTO dto) {
         if (userRepository.findByDni(dto.getDni()).isPresent()) {
-            throw new DuplicateDniException(dto.getDni());
+            throw new ObjectNotFoundException("User", dto.getDni());
         }
         User user = toEntity(dto);
         return toResponseDTO(userRepository.save(user));

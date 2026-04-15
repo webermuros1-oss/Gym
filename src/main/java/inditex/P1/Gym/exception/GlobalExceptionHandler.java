@@ -14,16 +14,10 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 404 - Objeto no encontrado
+    // 404 / 409 - Objeto no encontrado o conflicto de datos
     @ExceptionHandler(ObjectNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleObjectNotFound(ObjectNotFoundException exception) {
-        return new ResponseEntity<>(new ErrorResponse(exception.getMessage()), HttpStatus.NOT_FOUND);
-    }
-
-    // 409 - DNI duplicado
-    @ExceptionHandler(DuplicateDniException.class)
-    public ResponseEntity<ErrorResponse> handleDuplicateDni(DuplicateDniException exception) {
-        return new ResponseEntity<>(new ErrorResponse(exception.getMessage()), HttpStatus.CONFLICT);
+        return new ResponseEntity<>(new ErrorResponse(exception.getMessage()), exception.getStatus());
     }
 
     // 400 - Campos inválidos (@Valid)
