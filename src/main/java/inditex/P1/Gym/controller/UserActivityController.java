@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import inditex.P1.Gym.dto.ActivityDTO;
+import inditex.P1.Gym.DTO.ActivityResponseDTO;
 import inditex.P1.Gym.service.ActivityService;
 
 @RestController
@@ -21,7 +21,7 @@ public class UserActivityController {
     }
 
     @GetMapping("/{userId}/activities")
-    public List<ActivityDTO> getActivitiesByUser(@PathVariable Long userId) {
+    public List<ActivityResponseDTO> getActivitiesByUser(@PathVariable Long userId) {
         return activityService.getActivitiesByUser(userId);
     }
 }

@@ -1,4 +1,4 @@
-package inditex.P1.Gym.entity;
+package inditex.P1.Gym.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

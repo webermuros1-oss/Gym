@@ -5,11 +5,11 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import inditex.P1.Gym.dto.ActivityDTO;
-import inditex.P1.Gym.entity.Activity;
-import inditex.P1.Gym.entity.Teacher;
-import inditex.P1.Gym.entity.User;
-import inditex.P1.Gym.mapper.ActivityMapper;
+import inditex.P1.Gym.DTO.ActivityRequestDTO;
+import inditex.P1.Gym.DTO.ActivityResponseDTO;
+import inditex.P1.Gym.model.Activity;
+import inditex.P1.Gym.model.Teacher;
+import inditex.P1.Gym.model.User;
 import inditex.P1.Gym.repository.ActivityRepository;
 import inditex.P1.Gym.repository.TeacherRepository;
 import inditex.P1.Gym.repository.UserRepository;
@@ -28,7 +28,7 @@ public class ActivityService {
         this.userRepository = userRepository;
     }
 
-    public ActivityDTO create(ActivityDTO dto) {
+    public ActivityResponseDTO create(ActivityRequestDTO dto) {
         Teacher teacher = teacherRepository.findById(dto.getTeacherId())
                 .orElseThrow(() -> new RuntimeException("Teacher not found"));
 
@@ -41,10 +41,10 @@ public class ActivityService {
         activity.setTeacher(teacher);
 
         Activity savedActivity = activityRepository.save(activity);
-        return ActivityMapper.toDTO(savedActivity);
+        return toResponseDTO(savedActivity);
     }
 
-    public ActivityDTO update(Long id, ActivityDTO dto) {
+    public ActivityResponseDTO update(Long id, ActivityRequestDTO dto) {
         Activity activity = activityRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Activity not found"));
 
@@ -59,7 +59,7 @@ public class ActivityService {
         activity.setTeacher(teacher);
 
         Activity updatedActivity = activityRepository.save(activity);
-        return ActivityMapper.toDTO(updatedActivity);
+        return toResponseDTO(updatedActivity);
     }
 
     public void delete(Long id) {
@@ -70,7 +70,7 @@ public class ActivityService {
         activityRepository.deleteById(id);
     }
 
-    public ActivityDTO registerUser(Long activityId, Long userId) {
+    public ActivityResponseDTO registerUser(Long activityId, Long userId) {
         Activity activity = activityRepository.findById(activityId)
                 .orElseThrow(() -> new RuntimeException("Activity not found"));
 
@@ -97,31 +97,45 @@ public class ActivityService {
         activity.getUsers().add(user);
 
         Activity savedActivity = activityRepository.save(activity);
-        return ActivityMapper.toDTO(savedActivity);
+        return toResponseDTO(savedActivity);
     }
 
-    public List<ActivityDTO> getFutureActivities() {
+    public List<ActivityResponseDTO> getFutureActivities() {
         return activityRepository.findAll().stream()
                 .filter(activity -> activity.getDate() != null)
                 .filter(activity -> activity.getDate().isAfter(LocalDateTime.now()))
-                .map(ActivityMapper::toDTO)
+                .map(this::toResponseDTO)
                 .toList();
     }
 
-    public List<ActivityDTO> getActivitiesByUser(Long userId) {
+    public List<ActivityResponseDTO> getActivitiesByUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         return user.getActivities().stream()
-                .map(ActivityMapper::toDTO)
+                .map(this::toResponseDTO)
                 .toList();
     }
 
-    public List<ActivityDTO> getActivitiesByTeacher(Long teacherId) {
+    public List<ActivityResponseDTO> getActivitiesByTeacher(Long teacherId) {
         return activityRepository.findAll().stream()
                 .filter(activity -> activity.getTeacher() != null)
                 .filter(activity -> activity.getTeacher().getId().equals(teacherId))
-                .map(ActivityMapper::toDTO)
+                .map(this::toResponseDTO)
                 .toList();
+    }
+
+    private ActivityResponseDTO toResponseDTO(Activity activity) {
+        Long teacherId = activity.getTeacher() != null ? activity.getTeacher().getId() : null;
+
+        return new ActivityResponseDTO(
+                activity.getId(),
+                activity.getTitle(),
+                activity.getDescription(),
+                activity.getPrice(),
+                activity.getDate(),
+                activity.getImageUrl(),
+                teacherId
+        );
     }
 }
