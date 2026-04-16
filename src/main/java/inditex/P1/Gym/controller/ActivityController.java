@@ -7,11 +7,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import inditex.P1.Gym.DTO.ActivityDetailResponseDTO;
 import inditex.P1.Gym.DTO.ActivityRequestDTO;
 import inditex.P1.Gym.DTO.ActivityResponseDTO;
 import inditex.P1.Gym.service.ActivityService;
+import inditex.P1.Gym.service.CloudinaryService;
 
 @RestController
 @RequestMapping("/api/activities")
@@ -20,6 +22,7 @@ import inditex.P1.Gym.service.ActivityService;
 public class ActivityController {
 
     private final ActivityService activityService;
+    private final CloudinaryService cloudinaryService;
 
     @GetMapping("/future")
     public ResponseEntity<List<ActivityResponseDTO>> getFutureActivities() {
@@ -36,14 +39,22 @@ public class ActivityController {
         return ResponseEntity.ok(activityService.getActivitiesByTeacher(teacherId));
     }
 
-    @PostMapping
-    public ResponseEntity<ActivityResponseDTO> create(@Valid @RequestBody ActivityRequestDTO dto) {
+    @PostMapping(consumes = "multipart/form-data")
+    public ResponseEntity<ActivityResponseDTO> create(@Valid @ModelAttribute ActivityRequestDTO dto,
+                                                      @RequestPart(required = false) MultipartFile image) {
+        if (image != null && !image.isEmpty()) {
+            dto.setImageUrl(cloudinaryService.uploadImage(image));
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(activityService.create(dto));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = "multipart/form-data")
     public ResponseEntity<ActivityResponseDTO> update(@PathVariable Long id,
-                                                      @Valid @RequestBody ActivityRequestDTO dto) {
+                                                      @Valid @ModelAttribute ActivityRequestDTO dto,
+                                                      @RequestPart(required = false) MultipartFile image) {
+        if (image != null && !image.isEmpty()) {
+            dto.setImageUrl(cloudinaryService.uploadImage(image));
+        }
         return ResponseEntity.ok(activityService.update(id, dto));
     }
 

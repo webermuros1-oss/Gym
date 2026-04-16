@@ -3,6 +3,8 @@ package inditex.P1.Gym.DTO;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -29,6 +31,7 @@ public class ActivityRequestDTO {
     private BigDecimal price;
 
     @NotNull(message = "La fecha no puede ser nula")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime date;
 
     private String imageUrl;
