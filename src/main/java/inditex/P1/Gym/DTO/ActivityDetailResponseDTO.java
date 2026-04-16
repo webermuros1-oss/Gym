@@ -20,4 +20,5 @@ public class ActivityDetailResponseDTO {
     private String imageUrl;
     private TeacherResponseDTO teacher;
     private List<UserResponseDTO> users;
+    private int enrolledCount;
 }

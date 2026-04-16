@@ -28,7 +28,10 @@ public class CloudinaryService {
 
     public String uploadImage(MultipartFile file) {
         try {
-            Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+            Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
+                    "quality", "auto:good",
+                    "fetch_format", "auto"
+            ));
             return (String) uploadResult.get("secure_url");
         } catch (IOException e) {
             throw new IllegalArgumentException("Error al subir la imagen a Cloudinary");

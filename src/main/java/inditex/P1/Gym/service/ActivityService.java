@@ -104,7 +104,8 @@ public class ActivityService {
                 activity.getDate(),
                 activity.getImageUrl(),
                 teacherDTO,
-                userDTOs
+                userDTOs,
+                userDTOs.size()
         );
     }
 
@@ -173,7 +174,8 @@ public class ActivityService {
                 activity.getPrice(),
                 activity.getDate(),
                 activity.getImageUrl(),
-                teacherId
+                teacherId,
+                activity.getUsers().size()
         );
     }
 }

@@ -21,4 +21,5 @@ public class ActivityResponseDTO {
     private LocalDateTime date;
     private String imageUrl;
     private Long teacherId;
+    private int enrolledCount;
 }
