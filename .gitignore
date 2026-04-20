@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Credenciales - NO subir a GitHub ###
+src/main/resources/application.properties

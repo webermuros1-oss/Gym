@@ -14,12 +14,7 @@ spring.jpa.hibernate.naming.physical-strategy=org.hibernate.boot.model.naming.Ph
 # Puerto del servidor
 server.port=8080
 
-# Multipart (subida de imágenes)
-spring.servlet.multipart.max-file-size=20MB
-spring.servlet.multipart.max-request-size=20MB
-
 # Cloudinary
-cloudinary.cloud-name=dkdwgdm3h
-cloudinary.api-key=582928881134758
-cloudinary.api-secret=1dtRMZkOwunHA-SfAGtvco0PnI4
-
+cloudinary.cloud-name=TU_CLOUD_NAME
+cloudinary.api-key=TU_API_KEY
+cloudinary.api-secret=TU_API_SECRET
