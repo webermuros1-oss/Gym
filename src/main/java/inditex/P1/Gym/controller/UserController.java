@@ -3,7 +3,6 @@ package inditex.P1.Gym.controller;
 
 import inditex.P1.Gym.DTO.UserRequestDTO;
 import inditex.P1.Gym.DTO.UserResponseDTO;
-import inditex.P1.Gym.service.CloudinaryService;
 import inditex.P1.Gym.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +21,6 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-    private final CloudinaryService cloudinaryService;
 
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
@@ -42,20 +40,14 @@ public class UserController {
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<UserResponseDTO> createUser(@Valid @ModelAttribute UserRequestDTO dto,
                                                       @RequestPart(required = false) MultipartFile image) {
-        if (image != null && !image.isEmpty()) {
-            dto.setImageUrl(cloudinaryService.uploadImage(image));
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(dto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(dto, image));
     }
 
     @PutMapping(value = "/{id}", consumes = "multipart/form-data")
     public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id,
                                                       @Valid @ModelAttribute UserRequestDTO dto,
                                                       @RequestPart(required = false) MultipartFile image) {
-        if (image != null && !image.isEmpty()) {
-            dto.setImageUrl(cloudinaryService.uploadImage(image));
-        }
-        return ResponseEntity.ok(userService.updateUser(id, dto));
+        return ResponseEntity.ok(userService.updateUser(id, dto, image));
     }
 
     @DeleteMapping("/{id}")

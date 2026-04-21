@@ -7,6 +7,7 @@ import inditex.P1.Gym.model.User;
 import inditex.P1.Gym.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final CloudinaryService cloudinaryService;
 
     public List<UserResponseDTO> getAllUsers(){
         return userRepository.findAll()
@@ -36,17 +38,23 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public UserResponseDTO createUser(UserRequestDTO dto) {
+    public UserResponseDTO createUser(UserRequestDTO dto, MultipartFile image) {
         if (userRepository.findByDni(dto.getDni()).isPresent()) {
             throw new ObjectNotFoundException("User", dto.getDni());
+        }
+        if (image != null && !image.isEmpty()) {
+            dto.setImageUrl(cloudinaryService.uploadImage(image));
         }
         User user = toEntity(dto);
         return toResponseDTO(userRepository.save(user));
     }
 
-    public UserResponseDTO updateUser(Long id, UserRequestDTO dto) {
+    public UserResponseDTO updateUser(Long id, UserRequestDTO dto, MultipartFile image) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException("User", id));
+        if (image != null && !image.isEmpty()) {
+            dto.setImageUrl(cloudinaryService.uploadImage(image));
+        }
         user.setFirstName(dto.getFirstName());
         user.setLastName(dto.getLastName());
         user.setDni(dto.getDni());

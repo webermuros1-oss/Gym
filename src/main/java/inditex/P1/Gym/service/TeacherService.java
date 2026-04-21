@@ -7,6 +7,7 @@ import inditex.P1.Gym.model.Teacher;
 import inditex.P1.Gym.repository.TeacherRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 public class TeacherService {
 
     private final TeacherRepository teacherRepository;
+    private final CloudinaryService cloudinaryService;
 
     public List<TeacherResponseDTO> getAllTeachers() {
         return teacherRepository.findAll()
@@ -37,16 +39,22 @@ public class TeacherService {
                 .collect(Collectors.toList());
     }
 
-    public TeacherResponseDTO createTeacher(TeacherRequestDTO dto) {
+    public TeacherResponseDTO createTeacher(TeacherRequestDTO dto, MultipartFile image) {
         if (teacherRepository.findByDni(dto.getDni()).isPresent()) {
             throw new ObjectNotFoundException("Teacher", dto.getDni());
+        }
+        if (image != null && !image.isEmpty()) {
+            dto.setImageUrl(cloudinaryService.uploadImage(image));
         }
         return toResponseDTO(teacherRepository.save(toEntity(dto)));
     }
 
-    public TeacherResponseDTO updateTeacher(Long id, TeacherRequestDTO dto) {
+    public TeacherResponseDTO updateTeacher(Long id, TeacherRequestDTO dto, MultipartFile image) {
         Teacher teacher = teacherRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException("Teacher", id));
+        if (image != null && !image.isEmpty()) {
+            dto.setImageUrl(cloudinaryService.uploadImage(image));
+        }
         teacher.setFirstName(dto.getFirstName());
         teacher.setLastName(dto.getLastName());
         teacher.setDni(dto.getDni());

@@ -2,7 +2,6 @@ package inditex.P1.Gym.controller;
 
 import inditex.P1.Gym.DTO.TeacherRequestDTO;
 import inditex.P1.Gym.DTO.TeacherResponseDTO;
-import inditex.P1.Gym.service.CloudinaryService;
 import inditex.P1.Gym.service.TeacherService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,6 @@ import java.util.List;
 public class TeacherController {
 
     private final TeacherService teacherService;
-    private final CloudinaryService cloudinaryService;
 
     @GetMapping
     public ResponseEntity<List<TeacherResponseDTO>> getAllTeachers() {
@@ -40,20 +38,14 @@ public class TeacherController {
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<TeacherResponseDTO> createTeacher(@Valid @ModelAttribute TeacherRequestDTO dto,
                                                             @RequestPart(required = false) MultipartFile image) {
-        if (image != null && !image.isEmpty()) {
-            dto.setImageUrl(cloudinaryService.uploadImage(image));
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(teacherService.createTeacher(dto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(teacherService.createTeacher(dto, image));
     }
 
     @PutMapping(value = "/{id}", consumes = "multipart/form-data")
     public ResponseEntity<TeacherResponseDTO> updateTeacher(@PathVariable Long id,
                                                             @Valid @ModelAttribute TeacherRequestDTO dto,
                                                             @RequestPart(required = false) MultipartFile image) {
-        if (image != null && !image.isEmpty()) {
-            dto.setImageUrl(cloudinaryService.uploadImage(image));
-        }
-        return ResponseEntity.ok(teacherService.updateTeacher(id, dto));
+        return ResponseEntity.ok(teacherService.updateTeacher(id, dto, image));
     }
 
     @DeleteMapping("/{id}")

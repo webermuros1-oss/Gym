@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import inditex.P1.Gym.DTO.ActivityDetailResponseDTO;
 import inditex.P1.Gym.DTO.ActivityRequestDTO;
@@ -27,22 +28,29 @@ public class ActivityService {
     private final UserRepository userRepository;
     private final TeacherService teacherService;
     private final UserService userService;
+    private final CloudinaryService cloudinaryService;
 
     public ActivityService(ActivityRepository activityRepository, TeacherRepository teacherRepository,
-            UserRepository userRepository, TeacherService teacherService, UserService userService) {
+            UserRepository userRepository, TeacherService teacherService, UserService userService,
+            CloudinaryService cloudinaryService) {
         this.activityRepository = activityRepository;
         this.teacherRepository = teacherRepository;
         this.userRepository = userRepository;
         this.teacherService = teacherService;
         this.userService = userService;
+        this.cloudinaryService = cloudinaryService;
     }
 
-    public ActivityResponseDTO create(ActivityRequestDTO dto) {
+    public ActivityResponseDTO create(ActivityRequestDTO dto, MultipartFile image) {
         Teacher teacher = teacherRepository.findById(dto.getTeacherId())
                 .orElseThrow(() -> new ObjectNotFoundException("Teacher", dto.getTeacherId()));
 
         if (!teacher.isActive()) {
             throw new ObjectNotFoundException("Teacher", dto.getTeacherId(), false);
+        }
+
+        if (image != null && !image.isEmpty()) {
+            dto.setImageUrl(cloudinaryService.uploadImage(image));
         }
 
         Activity activity = new Activity();
@@ -56,7 +64,7 @@ public class ActivityService {
         return toResponseDTO(activityRepository.save(activity));
     }
 
-    public ActivityResponseDTO update(Long id, ActivityRequestDTO dto) {
+    public ActivityResponseDTO update(Long id, ActivityRequestDTO dto, MultipartFile image) {
         Activity activity = activityRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException("Activity", id));
 
@@ -65,6 +73,10 @@ public class ActivityService {
 
         if (!teacher.isActive()) {
             throw new ObjectNotFoundException("Teacher", dto.getTeacherId(), false);
+        }
+
+        if (image != null && !image.isEmpty()) {
+            dto.setImageUrl(cloudinaryService.uploadImage(image));
         }
 
         activity.setTitle(dto.getTitle());
@@ -107,6 +119,21 @@ public class ActivityService {
                 userDTOs,
                 userDTOs.size()
         );
+    }
+
+    public ActivityResponseDTO unregisterUser(Long activityId, Long userId) {
+        Activity activity = activityRepository.findById(activityId)
+                .orElseThrow(() -> new ObjectNotFoundException("Activity", activityId));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ObjectNotFoundException("User", userId));
+
+        if (!activity.getUsers().contains(user)) {
+            throw new IllegalArgumentException("El usuario con id: " + userId + " no está inscrito en esta actividad");
+        }
+
+        activity.getUsers().remove(user);
+        return toResponseDTO(activityRepository.save(activity));
     }
 
     public ActivityResponseDTO registerUser(Long activityId, Long userId) {

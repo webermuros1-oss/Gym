@@ -13,7 +13,6 @@ import inditex.P1.Gym.DTO.ActivityDetailResponseDTO;
 import inditex.P1.Gym.DTO.ActivityRequestDTO;
 import inditex.P1.Gym.DTO.ActivityResponseDTO;
 import inditex.P1.Gym.service.ActivityService;
-import inditex.P1.Gym.service.CloudinaryService;
 
 @RestController
 @RequestMapping("/api/activities")
@@ -22,7 +21,6 @@ import inditex.P1.Gym.service.CloudinaryService;
 public class ActivityController {
 
     private final ActivityService activityService;
-    private final CloudinaryService cloudinaryService;
 
     @GetMapping("/future")
     public ResponseEntity<List<ActivityResponseDTO>> getFutureActivities() {
@@ -42,20 +40,14 @@ public class ActivityController {
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<ActivityResponseDTO> create(@Valid @ModelAttribute ActivityRequestDTO dto,
                                                       @RequestPart(required = false) MultipartFile image) {
-        if (image != null && !image.isEmpty()) {
-            dto.setImageUrl(cloudinaryService.uploadImage(image));
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(activityService.create(dto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(activityService.create(dto, image));
     }
 
     @PutMapping(value = "/{id}", consumes = "multipart/form-data")
     public ResponseEntity<ActivityResponseDTO> update(@PathVariable Long id,
                                                       @Valid @ModelAttribute ActivityRequestDTO dto,
                                                       @RequestPart(required = false) MultipartFile image) {
-        if (image != null && !image.isEmpty()) {
-            dto.setImageUrl(cloudinaryService.uploadImage(image));
-        }
-        return ResponseEntity.ok(activityService.update(id, dto));
+        return ResponseEntity.ok(activityService.update(id, dto, image));
     }
 
     @DeleteMapping("/{id}")
@@ -68,5 +60,11 @@ public class ActivityController {
     public ResponseEntity<ActivityResponseDTO> registerUser(@PathVariable Long activityId,
                                                             @PathVariable Long userId) {
         return ResponseEntity.ok(activityService.registerUser(activityId, userId));
+    }
+
+    @DeleteMapping("/{activityId}/users/{userId}")
+    public ResponseEntity<ActivityResponseDTO> unregisterUser(@PathVariable Long activityId,
+                                                              @PathVariable Long userId) {
+        return ResponseEntity.ok(activityService.unregisterUser(activityId, userId));
     }
 }
