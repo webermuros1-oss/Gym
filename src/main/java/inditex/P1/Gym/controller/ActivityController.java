@@ -9,15 +9,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import inditex.P1.Gym.DTO.ActivityDetailResponseDTO;
-import inditex.P1.Gym.DTO.ActivityRequestDTO;
-import inditex.P1.Gym.DTO.ActivityResponseDTO;
+import inditex.P1.Gym.DTO.Activity.ActivityDetailResponseDTO;
+import inditex.P1.Gym.DTO.Activity.ActivityRequestDTO;
+import inditex.P1.Gym.DTO.Activity.ActivityResponseDTO;
 import inditex.P1.Gym.service.ActivityService;
 
 @RestController
 @RequestMapping("/api/activities")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class ActivityController {
 
     private final ActivityService activityService;

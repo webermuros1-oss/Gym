@@ -1,4 +1,4 @@
-package inditex.P1.Gym.DTO;
+package inditex.P1.Gym.DTO.user;
 
 
 import jakarta.validation.constraints.Min;

@@ -1,4 +1,4 @@
-package inditex.P1.Gym.DTO;
+package inditex.P1.Gym.DTO.Teacher;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;

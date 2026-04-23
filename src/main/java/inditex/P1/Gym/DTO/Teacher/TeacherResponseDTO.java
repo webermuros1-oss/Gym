@@ -1,22 +1,18 @@
-package inditex.P1.Gym.DTO;
+package inditex.P1.Gym.DTO.Teacher;
 
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserResponseDTO {
+public class TeacherResponseDTO {
 
     private Long id;
     private String firstName;
     private String lastName;
     private String dni;
-    private Integer registrationYear;
+    private Integer contractYear;
     private boolean active;
     private String imageUrl;
 }

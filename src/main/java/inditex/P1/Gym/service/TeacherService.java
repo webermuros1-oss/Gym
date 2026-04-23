@@ -1,10 +1,11 @@
 package inditex.P1.Gym.service;
 
-import inditex.P1.Gym.DTO.TeacherRequestDTO;
-import inditex.P1.Gym.DTO.TeacherResponseDTO;
+import inditex.P1.Gym.DTO.Teacher.TeacherRequestDTO;
+import inditex.P1.Gym.DTO.Teacher.TeacherResponseDTO;
 import inditex.P1.Gym.exception.ObjectNotFoundException;
 import inditex.P1.Gym.model.Teacher;
 import inditex.P1.Gym.repository.TeacherRepository;
+import inditex.P1.Gym.DTO.Teacher.TeacherMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,20 +23,20 @@ public class TeacherService {
     public List<TeacherResponseDTO> getAllTeachers() {
         return teacherRepository.findAll()
                 .stream()
-                .map(this::toResponseDTO)
+                .map(TeacherMapper::entity2DTO)
                 .collect(Collectors.toList());
     }
 
     public TeacherResponseDTO getTeacherById(Long id) {
         Teacher teacher = teacherRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException("Teacher", id));
-        return toResponseDTO(teacher);
+        return TeacherMapper.entity2DTO(teacher);
     }
 
     public List<TeacherResponseDTO> getActiveTeachers() {
         return teacherRepository.findByActiveTrue()
                 .stream()
-                .map(this::toResponseDTO)
+                .map(TeacherMapper::entity2DTO)
                 .collect(Collectors.toList());
     }
 
@@ -46,7 +47,7 @@ public class TeacherService {
         if (image != null && !image.isEmpty()) {
             dto.setImageUrl(cloudinaryService.uploadImage(image));
         }
-        return toResponseDTO(teacherRepository.save(toEntity(dto)));
+        return TeacherMapper.entity2DTO(teacherRepository.save(TeacherMapper.dto2Entity(dto)));
     }
 
     public TeacherResponseDTO updateTeacher(Long id, TeacherRequestDTO dto, MultipartFile image) {
@@ -55,13 +56,8 @@ public class TeacherService {
         if (image != null && !image.isEmpty()) {
             dto.setImageUrl(cloudinaryService.uploadImage(image));
         }
-        teacher.setFirstName(dto.getFirstName());
-        teacher.setLastName(dto.getLastName());
-        teacher.setDni(dto.getDni());
-        teacher.setContractYear(dto.getContractYear());
-        teacher.setActive(dto.isActive());
-        teacher.setImageUrl(dto.getImageUrl());
-        return toResponseDTO(teacherRepository.save(teacher));
+        TeacherMapper.updateEntityFromDto(teacher, dto);
+        return TeacherMapper.entity2DTO(teacherRepository.save(teacher));
     }
 
     public void deleteTeacher(Long id) {
@@ -71,29 +67,4 @@ public class TeacherService {
         teacherRepository.deleteById(id);
     }
 
-    // --- Mapeos ---
-
-    public TeacherResponseDTO toResponseDTO(Teacher teacher) {
-        return new TeacherResponseDTO(
-                teacher.getId(),
-                teacher.getFirstName(),
-                teacher.getLastName(),
-                teacher.getDni(),
-                teacher.getContractYear(),
-                teacher.isActive(),
-                teacher.getImageUrl()
-        );
-    }
-
-    private Teacher toEntity(TeacherRequestDTO dto) {
-        return new Teacher(
-                null,
-                dto.getFirstName(),
-                dto.getLastName(),
-                dto.getDni(),
-                dto.getContractYear(),
-                dto.isActive(),
-                dto.getImageUrl()
-        );
-    }
 }
