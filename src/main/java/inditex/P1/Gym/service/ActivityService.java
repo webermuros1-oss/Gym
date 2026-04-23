@@ -1,5 +1,8 @@
 package inditex.P1.Gym.service;
 
+import mapper.ActivityMapper;
+import mapper.TeacherMapper;
+import mapper.UserMapper;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,18 +29,14 @@ public class ActivityService {
     private final ActivityRepository activityRepository;
     private final TeacherRepository teacherRepository;
     private final UserRepository userRepository;
-    private final TeacherService teacherService;
-    private final UserService userService;
     private final CloudinaryService cloudinaryService;
 
     public ActivityService(ActivityRepository activityRepository, TeacherRepository teacherRepository,
-            UserRepository userRepository, TeacherService teacherService, UserService userService,
+            UserRepository userRepository,
             CloudinaryService cloudinaryService) {
         this.activityRepository = activityRepository;
         this.teacherRepository = teacherRepository;
         this.userRepository = userRepository;
-        this.teacherService = teacherService;
-        this.userService = userService;
         this.cloudinaryService = cloudinaryService;
     }
 
@@ -53,15 +52,10 @@ public class ActivityService {
             dto.setImageUrl(cloudinaryService.uploadImage(image));
         }
 
-        Activity activity = new Activity();
-        activity.setTitle(dto.getTitle());
-        activity.setDescription(dto.getDescription());
-        activity.setPrice(dto.getPrice());
-        activity.setDate(dto.getDate());
-        activity.setImageUrl(dto.getImageUrl());
-        activity.setTeacher(teacher);
+        Activity activity = ActivityMapper.toEntity(dto);
+        ActivityMapper.setTeacher(activity, teacher);
 
-        return toResponseDTO(activityRepository.save(activity));
+        return ActivityMapper.toDTO(activityRepository.save(activity));
     }
 
     public ActivityResponseDTO update(Long id, ActivityRequestDTO dto, MultipartFile image) {
@@ -79,14 +73,10 @@ public class ActivityService {
             dto.setImageUrl(cloudinaryService.uploadImage(image));
         }
 
-        activity.setTitle(dto.getTitle());
-        activity.setDescription(dto.getDescription());
-        activity.setPrice(dto.getPrice());
-        activity.setDate(dto.getDate());
-        activity.setImageUrl(dto.getImageUrl());
-        activity.setTeacher(teacher);
+        ActivityMapper.updateEntity(activity, dto);
+        ActivityMapper.setTeacher(activity, teacher);
 
-        return toResponseDTO(activityRepository.save(activity));
+        return ActivityMapper.toDTO(activityRepository.save(activity));
     }
 
     public void delete(Long id) {
@@ -101,11 +91,11 @@ public class ActivityService {
                 .orElseThrow(() -> new ObjectNotFoundException("Activity", id));
 
         TeacherResponseDTO teacherDTO = activity.getTeacher() != null
-                ? teacherService.toResponseDTO(activity.getTeacher())
+                ? TeacherMapper.toDTO(activity.getTeacher())
                 : null;
 
         List<UserResponseDTO> userDTOs = activity.getUsers().stream()
-                .map(userService::toResponseDTO)
+                .map(UserMapper::toDTO)
                 .collect(Collectors.toList());
 
         return new ActivityDetailResponseDTO(
@@ -133,7 +123,7 @@ public class ActivityService {
         }
 
         activity.getUsers().remove(user);
-        return toResponseDTO(activityRepository.save(activity));
+        return ActivityMapper.toDTO(activityRepository.save(activity));
     }
 
     public ActivityResponseDTO registerUser(Long activityId, Long userId) {
@@ -161,14 +151,14 @@ public class ActivityService {
         }
 
         activity.getUsers().add(user);
-        return toResponseDTO(activityRepository.save(activity));
+        return ActivityMapper.toDTO(activityRepository.save(activity));
     }
 
     public List<ActivityResponseDTO> getFutureActivities() {
         return activityRepository.findAll().stream()
                 .filter(activity -> activity.getDate() != null)
                 .filter(activity -> activity.getDate().isAfter(LocalDateTime.now()))
-                .map(this::toResponseDTO)
+                .map(ActivityMapper::toDTO)
                 .toList();
     }
 
@@ -177,7 +167,7 @@ public class ActivityService {
                 .orElseThrow(() -> new ObjectNotFoundException("User", userId));
 
         return user.getActivities().stream()
-                .map(this::toResponseDTO)
+                .map(ActivityMapper::toDTO)
                 .toList();
     }
 
@@ -188,21 +178,7 @@ public class ActivityService {
         return activityRepository.findAll().stream()
                 .filter(activity -> activity.getTeacher() != null)
                 .filter(activity -> activity.getTeacher().getId().equals(teacherId))
-                .map(this::toResponseDTO)
+                .map(ActivityMapper::toDTO)
                 .toList();
-    }
-
-    private ActivityResponseDTO toResponseDTO(Activity activity) {
-        Long teacherId = activity.getTeacher() != null ? activity.getTeacher().getId() : null;
-        return new ActivityResponseDTO(
-                activity.getId(),
-                activity.getTitle(),
-                activity.getDescription(),
-                activity.getPrice(),
-                activity.getDate(),
-                activity.getImageUrl(),
-                teacherId,
-                activity.getUsers().size()
-        );
     }
 }

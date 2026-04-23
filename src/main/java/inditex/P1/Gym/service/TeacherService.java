@@ -1,5 +1,6 @@
 package inditex.P1.Gym.service;
 
+import mapper.TeacherMapper;
 import inditex.P1.Gym.DTO.TeacherRequestDTO;
 import inditex.P1.Gym.DTO.TeacherResponseDTO;
 import inditex.P1.Gym.exception.ObjectNotFoundException;
@@ -22,20 +23,20 @@ public class TeacherService {
     public List<TeacherResponseDTO> getAllTeachers() {
         return teacherRepository.findAll()
                 .stream()
-                .map(this::toResponseDTO)
+                .map(TeacherMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
     public TeacherResponseDTO getTeacherById(Long id) {
         Teacher teacher = teacherRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException("Teacher", id));
-        return toResponseDTO(teacher);
+        return TeacherMapper.toDTO(teacher);
     }
 
     public List<TeacherResponseDTO> getActiveTeachers() {
         return teacherRepository.findByActiveTrue()
                 .stream()
-                .map(this::toResponseDTO)
+                .map(TeacherMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
@@ -46,7 +47,8 @@ public class TeacherService {
         if (image != null && !image.isEmpty()) {
             dto.setImageUrl(cloudinaryService.uploadImage(image));
         }
-        return toResponseDTO(teacherRepository.save(toEntity(dto)));
+        Teacher teacher = TeacherMapper.toEntity(dto);
+        return TeacherMapper.toDTO(teacherRepository.save(teacher));
     }
 
     public TeacherResponseDTO updateTeacher(Long id, TeacherRequestDTO dto, MultipartFile image) {
@@ -55,13 +57,8 @@ public class TeacherService {
         if (image != null && !image.isEmpty()) {
             dto.setImageUrl(cloudinaryService.uploadImage(image));
         }
-        teacher.setFirstName(dto.getFirstName());
-        teacher.setLastName(dto.getLastName());
-        teacher.setDni(dto.getDni());
-        teacher.setContractYear(dto.getContractYear());
-        teacher.setActive(dto.isActive());
-        teacher.setImageUrl(dto.getImageUrl());
-        return toResponseDTO(teacherRepository.save(teacher));
+        TeacherMapper.updateEntity(teacher, dto);
+        return TeacherMapper.toDTO(teacherRepository.save(teacher));
     }
 
     public void deleteTeacher(Long id) {
@@ -69,31 +66,5 @@ public class TeacherService {
             throw new ObjectNotFoundException("Teacher", id);
         }
         teacherRepository.deleteById(id);
-    }
-
-    // --- Mapeos ---
-
-    public TeacherResponseDTO toResponseDTO(Teacher teacher) {
-        return new TeacherResponseDTO(
-                teacher.getId(),
-                teacher.getFirstName(),
-                teacher.getLastName(),
-                teacher.getDni(),
-                teacher.getContractYear(),
-                teacher.isActive(),
-                teacher.getImageUrl()
-        );
-    }
-
-    private Teacher toEntity(TeacherRequestDTO dto) {
-        return new Teacher(
-                null,
-                dto.getFirstName(),
-                dto.getLastName(),
-                dto.getDni(),
-                dto.getContractYear(),
-                dto.isActive(),
-                dto.getImageUrl()
-        );
     }
 }
