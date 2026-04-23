@@ -1,8 +1,8 @@
 package inditex.P1.Gym.service;
 
-import mapper.UserMapper;
-import inditex.P1.Gym.DTO.UserRequestDTO;
-import inditex.P1.Gym.DTO.UserResponseDTO;
+import inditex.P1.Gym.DTO.user.UserRequestDTO;
+import inditex.P1.Gym.DTO.user.UserMapper;
+import inditex.P1.Gym.DTO.user.UserResponseDTO;
 import inditex.P1.Gym.exception.ObjectNotFoundException;
 import inditex.P1.Gym.model.User;
 import inditex.P1.Gym.repository.UserRepository;
@@ -22,20 +22,20 @@ public class UserService {
     public List<UserResponseDTO> getAllUsers(){
         return userRepository.findAll()
                 .stream()
-                .map(UserMapper::toDTO)
+                .map(UserMapper::entity2DTO)
                 .collect(Collectors.toList());
     }
 
     public UserResponseDTO getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException("User", id));
-        return UserMapper.toDTO(user);
+        return UserMapper.entity2DTO(user);
     }
 
     public List<UserResponseDTO> getActiveUsers() {
         return userRepository.findByActiveTrue()
                 .stream()
-                .map(UserMapper::toDTO)
+                .map(UserMapper::entity2DTO)
                 .collect(Collectors.toList());
     }
 
@@ -46,8 +46,8 @@ public class UserService {
         if (image != null && !image.isEmpty()) {
             dto.setImageUrl(cloudinaryService.uploadImage(image));
         }
-        User user = UserMapper.toEntity(dto);
-        return UserMapper.toDTO(userRepository.save(user));
+        User user = UserMapper.dto2Entity(dto);
+        return UserMapper.entity2DTO(userRepository.save(user));
     }
 
     public UserResponseDTO updateUser(Long id, UserRequestDTO dto, MultipartFile image) {
@@ -56,8 +56,8 @@ public class UserService {
         if (image != null && !image.isEmpty()) {
             dto.setImageUrl(cloudinaryService.uploadImage(image));
         }
-        UserMapper.updateEntity(user, dto);
-        return UserMapper.toDTO(userRepository.save(user));
+        UserMapper.updateEntityFromDto(user, dto);
+        return UserMapper.entity2DTO(userRepository.save(user));
     }
 
     public void deleteUser(Long id) {

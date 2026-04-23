@@ -1,8 +1,8 @@
 package inditex.P1.Gym.controller;
 
 
-import inditex.P1.Gym.DTO.UserRequestDTO;
-import inditex.P1.Gym.DTO.UserResponseDTO;
+import inditex.P1.Gym.DTO.user.UserRequestDTO;
+import inditex.P1.Gym.DTO.user.UserResponseDTO;
 import inditex.P1.Gym.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-@CrossOrigin(origins= "*")
 public class UserController {
 
     private final UserService userService;

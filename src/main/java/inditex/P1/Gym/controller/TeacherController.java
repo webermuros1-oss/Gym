@@ -1,7 +1,7 @@
 package inditex.P1.Gym.controller;
 
-import inditex.P1.Gym.DTO.TeacherRequestDTO;
-import inditex.P1.Gym.DTO.TeacherResponseDTO;
+import inditex.P1.Gym.DTO.Teacher.TeacherRequestDTO;
+import inditex.P1.Gym.DTO.Teacher.TeacherResponseDTO;
 import inditex.P1.Gym.service.TeacherService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/teachers")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class TeacherController {
 
     private final TeacherService teacherService;

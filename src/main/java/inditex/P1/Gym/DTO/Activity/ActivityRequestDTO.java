@@ -1,4 +1,4 @@
-package inditex.P1.Gym.DTO;
+package inditex.P1.Gym.DTO.Activity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

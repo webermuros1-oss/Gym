@@ -1,16 +1,18 @@
-package inditex.P1.Gym.DTO;
-
-import lombok.*;
+package inditex.P1.Gym.DTO.Activity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ActivityDetailResponseDTO {
+public class ActivityResponseDTO {
 
     private Long id;
     private String title;
@@ -18,7 +20,6 @@ public class ActivityDetailResponseDTO {
     private BigDecimal price;
     private LocalDateTime date;
     private String imageUrl;
-    private TeacherResponseDTO teacher;
-    private List<UserResponseDTO> users;
+    private Long teacherId;
     private int enrolledCount;
 }
